@@ -24,6 +24,7 @@ Vue.component('note', {
                         }
                     ],
                     type: 'col-2',
+                    date: '',
                     progress: 0
                 },
                 {
@@ -43,9 +44,11 @@ Vue.component('note', {
                         }
                     ],
                     type: 'col-3',
+                    date: '',
                     progress: 1.0
                 }
-            ]
+            ],
+            date: ''
         }
     },
     template: `
@@ -59,12 +62,13 @@ Vue.component('note', {
                         @click="donePoint(point, note)" 
                         @click="countDonePoints(note)"
                         @click="checkType(note)"
+                        @click="dateSet(note)"
                     >
                         {{ point.pointTitle }} - {{ note.type }}
                     </li>
                 </ul>
                 <p v-if="note.type == 'col-3'">
-                    data
+                    Дата: {{ note.date }}
                 </p>
             </div>
         </div>
@@ -101,6 +105,12 @@ Vue.component('note', {
             if (note.progress >= 0 && note.progress < 0.5) {
                 note.type = 'col-1'
             }
+        },
+        dateSet(note){
+            if (note.progress == 1) {
+                let today = new Date().toLocaleString()
+                note.date = today
+            }
         }
     }
 })
@@ -111,6 +121,7 @@ Vue.component('create-note', {
             title: '',
             points: '',
             type: 'col-1',
+            date: '',
             progress: 0,
             errors: []
         }
@@ -149,6 +160,7 @@ Vue.component('create-note', {
                     title: this.title,
                     points: newPoints,
                     type: this.type,
+                    date: this.date,
                     progress: this.progress
                 }
                 eventBus.$emit('note-created', note)
