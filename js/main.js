@@ -24,7 +24,7 @@ Vue.component('note', {
                         }
                     ],
                     type: 'col-2',
-                    progress: 0.5
+                    progress: 0
                 },
                 {
                     title: 'title3',
@@ -53,8 +53,14 @@ Vue.component('note', {
             <div class="m-3 p-3 border border-danger" v-for="note in notes" v-show="note.type == types ">
                 <h5>{{note.title}}</h5>
                 <ul>
-                    <li v-for="point in note.points" @click="donePoint(point)" :class="{markPoint: point.pointStatus}">
-                        {{ point.pointTitle }} - {{ point.pointStatus }}
+                    <li 
+                        v-for="point in note.points" 
+                        :class="{markPoint: point.pointStatus}"
+                        @click="donePoint(point, note)" 
+                        @click="countDonePoints(note)"
+                        @click="checkType(note)"
+                    >
+                        {{ point.pointTitle }} - {{ note.type }}
                     </li>
                 </ul>
                 <p v-if="note.type == 'col-3'">
@@ -69,11 +75,31 @@ Vue.component('note', {
         })
     },
     methods: {
-        donePoint(point) {
+        donePoint(point, note) {
             if (point.pointStatus == false) {
                 point.pointStatus = true
             } else {
                 point.pointStatus = false
+            }
+        },
+        countDonePoints(note) {
+            let counterTrue = 0
+            for (point in note.points) {
+                if (note.points[point].pointStatus) {
+                    counterTrue += 1
+                }
+            }
+            note.progress = counterTrue / note.points.length
+        },
+        checkType(note) {
+            if (note.progress >= 0.5 && note.progress < 1) {
+                note.type = 'col-2'
+            }
+            if ( note.progress == 1) {
+                note.type = 'col-3'
+            }
+            if (note.progress >= 0 && note.progress < 0.5) {
+                note.type = 'col-1'
             }
         }
     }
@@ -144,11 +170,5 @@ let app = new Vue({
     el: '#app',
     data: {
         types: ['col-1', 'col-2', 'col-3'],
-        createdCounter: 0,
-        halfProgressCounter: 0,
-    },
-    methods: {
-
     }
-
 })
