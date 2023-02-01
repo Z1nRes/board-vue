@@ -10,9 +10,18 @@ Vue.component('note', {
                 {
                     title: 'title2',
                     points: [
-                        'first point',
-                        'second point',
-                        'third point',
+                        {
+                            pointTitle: 'first point',
+                            pointStatus: false
+                        },
+                        {
+                            pointTitle: 'second point',
+                            pointStatus: true
+                        },
+                        {
+                            pointTitle: 'third point',
+                            pointStatus: false
+                        }
                     ],
                     type: 'col-2',
                     progress: 0.5
@@ -20,9 +29,18 @@ Vue.component('note', {
                 {
                     title: 'title3',
                     points: [
-                        'first point',
-                        'second point',
-                        'third point',
+                        {
+                            pointTitle: 'first point',
+                            pointStatus: true
+                        },
+                        {
+                            pointTitle: 'second point',
+                            pointStatus: true
+                        },
+                        {
+                            pointTitle: 'third point',
+                            pointStatus: true
+                        }
                     ],
                     type: 'col-3',
                     progress: 1.0
@@ -36,7 +54,7 @@ Vue.component('note', {
                 <h5>{{note.title}}</h5>
                 <ul>
                     <li v-for="point in note.points">
-                        {{ point }}
+                        {{ point.pointTitle }} - {{ point.pointStatus }}
                     </li>
                 </ul>
                 <p v-if="note.type == 'col-3'">
@@ -49,6 +67,9 @@ Vue.component('note', {
         eventBus.$on('note-created', note => {
             this.notes.push(note)
         })
+    },
+    computed: {
+
     }
 })
 
@@ -79,23 +100,35 @@ Vue.component('create-note', {
     `,
     methods: {
         createNote() {
-            let note = {
-                title: this.title,
-                points: this.points.split("\n"),
-                type: this.type,
-                progress: this.progress
-            }
-            if (this.title && this.points && 3 <= note.points.length && note.points.length <= 5) {
-                    eventBus.$emit('note-created', note)
-                    this.title = null
-                    this.points = null
-                    this.errors = []
+            if (this.title && this.points && 3 <= this.points.split("\n").length && this.points.split("\n").length <= 5) {
+                let inputPoints = this.points.split("\n")
+                
+                let newPoints = []
+
+                for (i in inputPoints){
+                    let point = {
+                        pointTitle: inputPoints[i],
+                        pointStatus: false
+                    }
+                    newPoints.push(point)
+                }
+
+                let note = {
+                    title: this.title,
+                    points: newPoints,
+                    type: this.type,
+                    progress: this.progress
+                }
+                eventBus.$emit('note-created', note)
+                this.title = null
+                this.points = null
+                this.errors = []
             } else {
                 this.errors = []
                 if (!this.title) this.errors.push("Введите заголовок!")
                 if (!this.points) this.errors.push("Введите пункты заметки!")
-                if ( 3 >= note.points.length) this.errors.push("Кол-во пунктов должно быть от 3х!")
-                if ( note.points.length >= 5) this.errors.push("Кол-во пунктов должно быть не более 5ти!")
+                if ( 3 >= this.points.split("\n").length) this.errors.push("Кол-во пунктов должно быть от 3х!")
+                if ( this.points.split("\n").length >= 5) this.errors.push("Кол-во пунктов должно быть не более 5ти!")
             }
         }
     }
