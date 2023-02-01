@@ -53,7 +53,7 @@ Vue.component('note', {
             <div class="m-3 p-3 border border-danger" v-for="note in notes" v-show="note.type == types ">
                 <h5>{{note.title}}</h5>
                 <ul>
-                    <li v-for="point in note.points">
+                    <li v-for="point in note.points" @click="donePoint(point)" :class="{markPoint: point.pointStatus}">
                         {{ point.pointTitle }} - {{ point.pointStatus }}
                     </li>
                 </ul>
@@ -68,8 +68,14 @@ Vue.component('note', {
             this.notes.push(note)
         })
     },
-    computed: {
-
+    methods: {
+        donePoint(point) {
+            if (point.pointStatus == false) {
+                point.pointStatus = true
+            } else {
+                point.pointStatus = false
+            }
+        }
     }
 })
 
