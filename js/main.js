@@ -41,15 +41,19 @@ Vue.component('create-note', {
             title: '',
             points: '',
             type: '',
+            errors: []
         }
     },
     template: `
         <div class="d-flex justify-content-center">
+            <ul>
+                <li v-for="error in errors">{{error}}</li>
+            </ul>
             <form class="d-flex flex-column w-50 mt-4" @submit.prevent="createNote">
                 <input class="form-control mb-3" type="text" placeholder="Заголовок" v-model="title">
                 <div class="form-floating mb-3">
                     <textarea class="form-control" placeholder="Напишите здесь ваши заметки" id="textarea" style="height: 200px; resize: none;" v-model="points"></textarea>
-                    <label for="textarea">Каждый пункт писать с новой строки!</label>
+                    <label for="textarea">Введите 3-5 пунктов. Каждый пункт писать с новой строки!</label>
                 </div>
                 <input class="btn btn-primary" type="submit" value="Создать">
             </form>
@@ -57,15 +61,23 @@ Vue.component('create-note', {
     `,
     methods: {
         createNote() {
-            if (this.title && this.points) {
-                let note = {
-                    title: this.title,
-                    points: this.points.split("\n"),
-                    type: 'col-1'
-                }
-                eventBus.$emit('note-created', note)
-                this.title = '',
-                this.points = ''
+            let note = {
+                title: this.title,
+                points: this.points.split("\n"),
+                type: 'col-1'
+            }
+            if (this.title && this.points && 3 <= note.points.length && note.points.length <= 5) {
+                    eventBus.$emit('note-created', note)
+                    this.title = '',
+                    this.points = ''
+                    this.errors = []
+                
+            } else {
+                this.errors = []
+                if (!this.title) this.errors.push("Введите заголовок!")
+                if (!this.points) this.errors.push("Введите пункты заметки!")
+                if ( 3 >= note.points.length) this.errors.push("Кол-во пунктов должно быть от 3х!")
+                if ( note.points.length >= 5) this.errors.push("Кол-во пунктов должно быть не более 5ти!")
             }
         }
     }
