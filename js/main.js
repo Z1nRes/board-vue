@@ -1,30 +1,5 @@
 let eventBus = new Vue()
 
-Vue.component('first-col', {
-    template: `
-        <div class="col" style="height: 90vh;">
-            <note></note>    
-        </div>
-    `,
-    
-})
-
-Vue.component('second-col', {
-    template: `
-        <div class="col border-end border-start border-primary" style="height: 90vh;">
-            <note></note>    
-        </div>
-    `,
-})
-
-Vue.component('third-col', {
-    template: `
-        <div class="col" style="height: 90vh;">
-            <note></note>   
-        </div>
-    `,
-})
-
 Vue.component('note', {
     data() {
         return {
@@ -66,7 +41,6 @@ Vue.component('create-note', {
             title: '',
             points: '',
             type: '',
-            test: ['', '', 'eqwe', 'qwewqe']
         }
     },
     template: `
@@ -82,17 +56,6 @@ Vue.component('create-note', {
         </div>
     `,
     methods: {
-        filterNote() {
-            let newTest = []
-            console.log(typeof(this.test))
-            for (i in this.test) {
-                console.log(this.test[i])
-                if (this.test[i].lenght != 0) {
-                    
-                }
-            }
-            console.log(newTest)
-        },
         createNote() {
             if (this.title && this.points) {
                 let note = {
@@ -100,7 +63,6 @@ Vue.component('create-note', {
                     points: this.points.split("\n"),
                     type: 'col-1'
                 }
-                this.filterNote()
                 eventBus.$emit('note-created', note)
                 this.title = '',
                 this.points = ''
@@ -110,9 +72,14 @@ Vue.component('create-note', {
 })
 
 let app = new Vue({
+
     el: '#app',
     data: {
-
+        createdCounter: 0,
+        halfProgressCounter: 0,
     },
+    methods: {
+
+    }
 
 })
