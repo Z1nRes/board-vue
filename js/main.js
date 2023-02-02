@@ -48,7 +48,9 @@ Vue.component('note', {
                     progress: 1.0
                 }
             ],
-            date: ''
+            countFirstCol: 0,
+            countSecondCol: 0
+
         }
     },
     template: `
@@ -63,6 +65,7 @@ Vue.component('note', {
                         @click="countDonePoints(note)"
                         @click="checkType(note)"
                         @click="dateSet(note)"
+                        @click="checkCount()"
                     >
                         {{ point.pointTitle }} - {{ note.type }}
                     </li>
@@ -79,7 +82,7 @@ Vue.component('note', {
         })
     },
     methods: {
-        donePoint(point, note) {
+        donePoint(point) {
             if (point.pointStatus == false) {
                 point.pointStatus = true
             } else {
@@ -111,6 +114,19 @@ Vue.component('note', {
                 let today = new Date().toLocaleString()
                 note.date = today
             }
+        },
+        checkCount() {
+            this.countFirstCol = 0
+            this.countSecondCol = 0
+            for (i in this.notes) {
+                if (this.notes[i].type == 'col-1') {
+                    this.countFirstCol += 1
+                }
+                if (this.notes[i].type == 'col-2') {
+                    this.countSecondCol += 1
+                }
+            }
+            console.log(this.countFirstCol, '====', this.countSecondCol)
         }
     }
 })
@@ -123,7 +139,7 @@ Vue.component('create-note', {
             type: 'col-1',
             date: '',
             progress: 0,
-            errors: []
+            errors: [],
         }
     },
     template: `
@@ -132,12 +148,14 @@ Vue.component('create-note', {
                 <li v-for="error in errors">{{error}}</li>
             </ul>
             <form class="d-flex flex-column w-50 mt-4" @submit.prevent="createNote">
-                <input class="form-control mb-3" type="text" placeholder="Заголовок" v-model="title">
-                <div class="form-floating mb-3">
-                    <textarea class="form-control" placeholder="Напишите здесь ваши заметки" id="textarea" style="height: 200px; resize: none;" v-model="points"></textarea>
-                    <label for="textarea">Введите 3-5 пунктов. Каждый пункт писать с новой строки!</label>
-                </div>
-                <input class="btn btn-primary" type="submit" value="Создать">
+                <fieldset id="fieldset">
+                    <input class="form-control mb-3" type="text" placeholder="Заголовок" v-model="title">
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" placeholder="Напишите здесь ваши заметки" id="textarea" style="height: 200px; resize: none;" v-model="points"></textarea>
+                        <label for="textarea">Введите 3-5 пунктов. Каждый пункт писать с новой строки!</label>
+                    </div>
+                    <input class="btn btn-primary" type="submit" value="Создать">
+                </fieldset>
             </form>
         </div>
     `,
@@ -182,5 +200,6 @@ let app = new Vue({
     el: '#app',
     data: {
         types: ['col-1', 'col-2', 'col-3'],
-    }
+    },
+
 })
