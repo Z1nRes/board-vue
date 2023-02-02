@@ -14,7 +14,7 @@
     <div id="app" class="m-4">
         <div class="row align-items-start">
             <div class="col" style="height: 90vh;">
-                <note :types="types[0]"></note>
+                <note :types="types[0]" :displayForm="displayForm"></note>
             </div>
             <div class="col border-end border-start border-primary" style="height: 90vh;">
                 <note :types="types[1]"></note>
@@ -23,7 +23,10 @@
                 <note :types="types[2]"></note>
             </div>
         </div>
-        <create-note></create-note>
+        отобразить - {{ displayForm }}
+        <div :class="{display: !displayForm}">
+            <create-note></create-note>
+        </div>
     </div>
 </body>
 </html>

@@ -1,3 +1,6 @@
 .markPoint {
     text-decoration: line-through;
 }
+.display {
+    display: none;
+}

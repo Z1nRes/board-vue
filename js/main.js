@@ -49,8 +49,8 @@ Vue.component('note', {
                 }
             ],
             countFirstCol: 0,
-            countSecondCol: 0
-
+            countSecondCol: 0,
+            displayForm: true
         }
     },
     template: `
@@ -63,9 +63,9 @@ Vue.component('note', {
                         :class="{markPoint: point.pointStatus}"
                         @click="donePoint(point, note)" 
                         @click="countDonePoints(note)"
+                        @click="checkCount()"
                         @click="checkType(note)"
                         @click="dateSet(note)"
-                        @click="checkCount()"
                     >
                         {{ point.pointTitle }} - {{ note.type }}
                     </li>
@@ -99,14 +99,23 @@ Vue.component('note', {
             note.progress = counterTrue / note.points.length
         },
         checkType(note) {
-            if (note.progress >= 0.5 && note.progress < 1) {
-                note.type = 'col-2'
-            }
+            console.log(this.displayForm)
             if ( note.progress == 1) {
                 note.type = 'col-3'
             }
             if (note.progress >= 0 && note.progress < 0.5) {
-                note.type = 'col-1'
+                if (this.countFirstCol >= 3) {
+                    this.displayForm = false
+                    eventBus.$emit('takeDisplayForm', this.displayForm)
+                    console.log('Количество достигло 3х в кол-1')
+                } else {
+                    this.displayForm = true
+                    eventBus.$emit('takeDisplayForm', this.displayForm)
+                    note.type = 'col-1'
+                }
+            }
+            if (note.progress >= 0.5 && note.progress < 1) {
+                note.type = 'col-2'
             }
         },
         dateSet(note){
@@ -200,6 +209,11 @@ let app = new Vue({
     el: '#app',
     data: {
         types: ['col-1', 'col-2', 'col-3'],
+        displayForm: true
     },
-
+    mounted() {
+        eventBus.$on('takeDisplayForm', display =>{
+            this.displayForm = display
+        })
+    }
 })
