@@ -6,66 +6,26 @@ Vue.component('note', {
     },
     data() {
         return {
-            notes: [
-                {
-                    title: 'title2',
-                    points: [
-                        {
-                            pointTitle: 'first point',
-                            pointStatus: false
-                        },
-                        {
-                            pointTitle: 'second point',
-                            pointStatus: true
-                        },
-                        {
-                            pointTitle: 'third point',
-                            pointStatus: false
-                        }
-                    ],
-                    type: 'col-2',
-                    date: '',
-                    progress: 0
-                },
-                {
-                    title: 'title3',
-                    points: [
-                        {
-                            pointTitle: 'first point',
-                            pointStatus: true
-                        },
-                        {
-                            pointTitle: 'second point',
-                            pointStatus: true
-                        },
-                        {
-                            pointTitle: 'third point',
-                            pointStatus: true
-                        }
-                    ],
-                    type: 'col-3',
-                    date: '',
-                    progress: 1.0
-                }
-            ],
+            notes: [],
             countFirstCol: 0,
             countSecondCol: 0,
-            displayForm: true
+            display: true
         }
     },
     template: `
         <div>
             <div class="m-3 p-3 border border-danger" v-for="note in notes" v-show="note.type == types ">
-                <h5>{{note.title}}</h5>
+                <h5>{{note.title}} - {{note.type}}</h5>
                 <ul>
                     <li 
                         v-for="point in note.points" 
                         :class="{markPoint: point.pointStatus}"
                         @click="donePoint(point, note)" 
                         @click="countDonePoints(note)"
-                        @click="checkCount()"
                         @click="checkType(note)"
+                        @click="checkCount()"
                         @click="dateSet(note)"
+                        @click="saveNotes()"
                     >
                         {{ point.pointTitle }} - {{ note.type }}
                     </li>
@@ -80,13 +40,23 @@ Vue.component('note', {
         eventBus.$on('note-created', note => {
             this.notes.push(note)
         })
+        if (localStorage.getItem('notes')) {
+            try {
+                this.notes = JSON.parse(localStorage.getItem('notes'))
+            } catch(e) {
+                localStorage.removeItem('notes')
+            }
+        }
     },
     methods: {
-        donePoint(point) {
-            if (point.pointStatus == false) {
-                point.pointStatus = true
+        donePoint(point, note) {
+            if (this.countSecondCol >= 5 && note.type == 'col-1') {
             } else {
-                point.pointStatus = false
+                if (point.pointStatus == false) {
+                    point.pointStatus = true
+                } else {
+                    point.pointStatus = false
+                }
             }
         },
         countDonePoints(note) {
@@ -99,29 +69,14 @@ Vue.component('note', {
             note.progress = counterTrue / note.points.length
         },
         checkType(note) {
-            console.log(this.displayForm)
-            if ( note.progress == 1) {
+            if (note.progress >= 0.5 && note.progress < 1 && this.countSecondCol < 5) {
+                    note.type = 'col-2'
+            }
+            if (note.type == 'col-2' && note.progress == 1) {
                 note.type = 'col-3'
             }
-            if (note.progress >= 0 && note.progress < 0.5) {
-                if (this.countFirstCol >= 3) {
-                    this.displayForm = false
-                    eventBus.$emit('takeDisplayForm', this.displayForm)
-                    console.log('Количество достигло 3х в кол-1')
-                } else {
-                    this.displayForm = true
-                    eventBus.$emit('takeDisplayForm', this.displayForm)
-                    note.type = 'col-1'
-                }
-            }
-            if (note.progress >= 0.5 && note.progress < 1) {
-                note.type = 'col-2'
-            }
-        },
-        dateSet(note){
-            if (note.progress == 1) {
-                let today = new Date().toLocaleString()
-                note.date = today
+            if (note.progress >= 0 && note.progress < 0.5 && this.countFirstCol < 3) {
+                note.type = 'col-1'
             }
         },
         checkCount() {
@@ -135,7 +90,22 @@ Vue.component('note', {
                     this.countSecondCol += 1
                 }
             }
-            console.log(this.countFirstCol, '====', this.countSecondCol)
+            if (this.countFirstCol >= 3) {
+                this.display = false
+            } else {
+                this.display = true
+            }
+            eventBus.$emit('takeDisplay', this.display)
+        },
+        dateSet(note) {
+            if (note.progress == 1) {
+                let today = new Date().toLocaleString()
+                note.date = today
+            }
+        },
+        saveNotes() {
+            const parsed = JSON.stringify(this.notes)
+            localStorage.setItem('notes', parsed)
         }
     }
 })
@@ -148,7 +118,7 @@ Vue.component('create-note', {
             type: 'col-1',
             date: '',
             progress: 0,
-            errors: [],
+            errors: []
         }
     },
     template: `
@@ -157,7 +127,7 @@ Vue.component('create-note', {
                 <li v-for="error in errors">{{error}}</li>
             </ul>
             <form class="d-flex flex-column w-50 mt-4" @submit.prevent="createNote">
-                <fieldset id="fieldset">
+                <fieldset>
                     <input class="form-control mb-3" type="text" placeholder="Заголовок" v-model="title">
                     <div class="form-floating mb-3">
                         <textarea class="form-control" placeholder="Напишите здесь ваши заметки" id="textarea" style="height: 200px; resize: none;" v-model="points"></textarea>
@@ -209,11 +179,11 @@ let app = new Vue({
     el: '#app',
     data: {
         types: ['col-1', 'col-2', 'col-3'],
-        displayForm: true
+        display: true
     },
     mounted() {
-        eventBus.$on('takeDisplayForm', display =>{
-            this.displayForm = display
+        eventBus.$on('takeDisplay', display => {
+            this.display = display
         })
     }
 })

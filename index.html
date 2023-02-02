@@ -14,7 +14,7 @@
     <div id="app" class="m-4">
         <div class="row align-items-start">
             <div class="col" style="height: 90vh;">
-                <note :types="types[0]" :displayForm="displayForm"></note>
+                <note :types="types[0]"></note>
             </div>
             <div class="col border-end border-start border-primary" style="height: 90vh;">
                 <note :types="types[1]"></note>
@@ -23,10 +23,12 @@
                 <note :types="types[2]"></note>
             </div>
         </div>
-        отобразить - {{ displayForm }}
-        <div :class="{display: !displayForm}">
-            <create-note></create-note>
-        </div>
+        <create-note v-if="display == true"></create-note>
+        <p v-if="display == false">
+            Похоже места под заметки закончились... 
+            Попробуйте выполнить 1 заметку из второй колонки(В процессе), 
+            а затем пометить пункт из заметки в первой колонке(Новые).
+        </p>
     </div>
 </body>
 </html>
