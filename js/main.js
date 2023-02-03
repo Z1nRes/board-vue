@@ -122,11 +122,11 @@ Vue.component('create-note', {
         }
     },
     template: `
-        <div class="d-flex justify-content-center">
+        <div>
             <ul>
                 <li v-for="error in errors">{{error}}</li>
             </ul>
-            <form class="d-flex flex-column w-50 mt-4" @submit.prevent="createNote">
+            <form class="d-flex flex-column mt-4 " @submit.prevent="createNote">
                 <fieldset>
                     <input class="form-control mb-3" type="text" placeholder="Заголовок" v-model="title">
                     <div class="form-floating mb-3">
@@ -134,6 +134,7 @@ Vue.component('create-note', {
                         <label for="textarea">Введите 3-5 пунктов. Каждый пункт писать с новой строки!</label>
                     </div>
                     <input class="btn btn-primary" type="submit" value="Создать">
+                    <div class="btn btn-danger" @click="modal">Закрыть форму</div>
                 </fieldset>
             </form>
         </div>
@@ -171,6 +172,10 @@ Vue.component('create-note', {
                 if ( 3 >= this.points.split("\n").length) this.errors.push("Кол-во пунктов должно быть от 3х!")
                 if ( this.points.split("\n").length >= 5) this.errors.push("Кол-во пунктов должно быть не более 5ти!")
             }
+        },
+        modal() {
+            let displayModal = false
+            eventBus.$emit('getModal', displayModal)
         }
     }
 })
@@ -179,11 +184,24 @@ let app = new Vue({
     el: '#app',
     data: {
         types: ['col-1', 'col-2', 'col-3'],
-        display: true
+        display: true,
+        displayModal: false
     },
     mounted() {
         eventBus.$on('takeDisplay', display => {
             this.display = display
         })
+        eventBus.$on('getModal', displayModal => {
+            this.displayModal = displayModal
+        })
+    },
+    methods: {
+        modal() {
+            if (this.displayModal == false) {
+                this.displayModal = true
+            } else {
+                this.displayModal = false
+            }
+        }
     }
 })

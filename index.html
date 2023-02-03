@@ -23,10 +23,15 @@
                 <note :types="types[2]"></note>
             </div>
         </div>
-        <create-note v-if="display == true"></create-note>
+        <button class="btn btn-dark" @click="modal" v-if="display == true">Создать заметку</button>
+        <div class="display" :class="{modal: displayModal}">
+            <div>
+                <create-note id="create-note"></create-note>
+            </div>
+        </div>
         <p v-if="display == false">
-            Похоже места под заметки закончились... 
-            Попробуйте выполнить 1 заметку из второй колонки(В процессе), 
+            Похоже места под заметки закончились...
+            Попробуйте выполнить 1 заметку из второй колонки(В процессе),
             а затем пометить пункт из заметки в первой колонке(Новые).
         </p>
     </div>
